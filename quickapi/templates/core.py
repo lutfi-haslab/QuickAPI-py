@@ -67,7 +67,7 @@ class Element:
         
         # Build children HTML
         children_html = ''.join(
-            child.to_html() if isinstance(child, Element) else str(child) 
+            child.to_html() if hasattr(child, 'to_html') else str(child) 
             for child in self.children
         )
         
@@ -104,6 +104,18 @@ class HTMLElement:
         return Element(tag=self.tag, props=props, children=children)
 
 
+class RawHTML:
+    """Raw HTML content that won't be escaped"""
+    def __init__(self, content: str):
+        self.content = content
+    
+    def to_html(self) -> str:
+        return self.content
+    
+    def __str__(self) -> str:
+        return self.content
+
+
 class HTMLBuilder:
     """Builder for HTML elements"""
     
@@ -119,6 +131,10 @@ class HTMLBuilder:
             children = []
         
         return Element(tag=tag, props=props, children=children)
+    
+    def raw(self, content: str) -> RawHTML:
+        """Create raw HTML content that won't be escaped"""
+        return RawHTML(content)
 
 
 # Global HTML builder instance
